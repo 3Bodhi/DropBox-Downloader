@@ -4,7 +4,7 @@ from datetime import datetime as date
 
 root,errorlist = tree.load_tree_from_file("CEG_1.json")
 #root.print_tree()
-#print(f" Errors {errorlist}")
+print(f" Errors {errorlist}")
 
 
 #download function

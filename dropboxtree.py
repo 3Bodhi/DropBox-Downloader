@@ -47,25 +47,39 @@ class Node:
         destination_path = os.path.join(destination_folder, self.name)
         print(f"Copying Dropbox Folder {self.path} to {destination_path}")
         # If the folder is less than 20GB, less than 10,000 files and doesn't already exist, download as a .zip.
+        # NOTE zip fails with internal server error if restricted files are in the zipped folder. Except error, copy folder as if it was a normal folder.
         if self.file_count < 10000 and self.file_count > 0 and self.size < 20 * 1024 * 1024 * 1024:
             zip_path = destination_path + ".zip"
+            flag_file_path = zip_path + ".incomplete" # flag file for incomplete downloads Maybe try modifying JSON?
+            if os.path.exists(flag_file_path):
+                os.remove(zip_path)  # delete incomplete file
             if not os.path.exists(zip_path):  
-                print(f"downloading Directory {zip_path} as .zip file")
+                print(f"    downloading Folder {self.path} as .zip file")
+                with open(flag_file_path, 'w') as flag_file:  # create a flag file
+                    pass
                 with open(zip_path, "wb") as f:
                     metadata, response = dbx.files_download_zip(self.path) #chunk downloads
                     for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
                         if chunk:
                             f.write(chunk)
+                os.remove(flag_file_path) 
             else:
                 print(f"    Skipped. {self.name} already zipped  at {zip_path}")
         else:
-            # If the folder is too large, Copy its files and subfolders
-            for child in self.children:
+             # If the folder is too large, Copy its files and subfolders
+            if not os.path.exists(destination_path):
+                os.makedirs(destination_path) 
+            for child in self.children: #traverse down to children -- subfolders and files
                 file_path = os.path.join(destination_path, child.name)
-                # if it's a file, check if it exists then copy
-                if child.file_count == 0:  # It's a file   
+                # if it's a file, check if it exists then download
+                if child.file_count == 0:  # It's a file
+                    flag_file_path = file_path + ".incomplete" # flag file for incomplete downloads Maybe try modifying JSON?
+                    if os.path.exists(flag_file_path):
+                        os.remove(file_path)  # delete incomplete file
                     if not os.path.exists(file_path):
                         print(f"    Downloading file {child.path}")
+                        with open(flag_file_path, 'w') as flag_file:  # create a flag file
+                            pass
                         with open(file_path, "wb") as f:
                             metadata, response = dbx.files_download(child.path)
                             for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
@@ -73,18 +87,21 @@ class Node:
                                     f.write(chunk)
                     else: 
                         print(f"    Skipped. File {child.name} already exists at {file_path}")
-                else:  # It's a directory
-                    # If folder or zipped folder doesn't exist, make directory. 
-                    #folder_path = os.path.join(destination_path, child.name)
-                    #zipped_folder = folder_path + ".zip"
-                    #if not os.path.exists(folder_path) and not os.path.exists(zipped_folder): 
-                        #print(folder_path)
-                        #print(zipped_folder)   
-                        #print(f"    Creating Folder {child.path}") 
-                    os.makedirs(file_path)
-                    #else: 
-                         #print(f"    Skipped. Folder already exists at {folder_path}")
-                    child.download_files(dbx, destination_path) #traverse into subfolders and restart function
+                else:  # It's a directory; recurse function
+                    child.download_files(dbx, destination_path) 
+
+                    ##### SLATED TO DELETE
+                     #If folder or zipped folder doesn't exist, make directory. 
+                    '''folder_path = os.path.join(destination_path, child.name)
+                    zipped_folder = folder_path + ".zip"
+                    if not os.path.exists(folder_path) and not os.path.exists(zipped_folder): 
+                        print(folder_path)
+                        print(zipped_folder)   
+                        print(f"    Creating Folder {child.path}")
+                        os.makedirs(folder_path)                  
+                    else: 
+                         print(f"    Skipped. Folder already exists at {folder_path}") '''
+                    #child.download_files(dbx, destination_path) #traverse into subfolders and restart function
                     
                         
                         
