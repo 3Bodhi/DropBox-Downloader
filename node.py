@@ -12,4 +12,6 @@ download_path = "\\\\lsa-rosati-win.turbo.storage.umich.edu\lsa-rosati\Google-Dr
 final_path = download_path + date.now().strftime("%Y") + "\\" + date.now().strftime("%B %Y")
 root.download_files(dbx,final_path)
 
+### TODO - import rich to improve readability of console output. Use rich to create download bars. Multi-thread downloads. queue for .zips vs files? 
+# If connection error, delete most recent download, retry after x
 

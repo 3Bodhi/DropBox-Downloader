@@ -14,9 +14,14 @@ Furthermore, the Node object can also visualize itself and its children nodes in
 import dropbox
 import os
 import json
-#from datetime import datetime as date
 
-access_token = 'uat.ABXsvuqLawhOU5jC0okO_Axl0-e5KNLJkbkwaVf7zhok_eJg8PY-vM11_Ixxtz1sp2uhoy288_NWGWB7O3LwI4_YHmtah6Lk1YTvG6IVJeKbzy_d8Hdizogt8E5gEXrAxKfPcXV5kU4cri8fkOlqh1HgUV2_j2OQJerfiNrp3QVWwfAiQaaq5Z5wq3-zRxNd50m7rv8uq5kUbHghX_xo4xZ1Hf1rJC7KtTEdNaekEvMFK8J1SpFLE8XRy0uU0_Jixarz1uJY4a0Z_84hQnMCifVBmUbvjCHrN4lZ2WalHMW3pwyZo1qpPwddIBYmWVwmFaGiAThV0FBqiaIXfvigMXdFvUoaiZVLBPQ7yGCtGDn2KgSg0tkTzMl7jRTCG_8AtL5WrERnWcgy3jYeCStsaRBAxHrbNlcgMo9nt3vJBkYeWknm6ErOx4IKXXp4RbqcoGEwK0ZUyslCUFoEkSxLNRZRh1Dkmyc8rMUdGyVem-ys2itTRySe_HRxx2nimd3HafMW4tnQKYe5Qbmq673a33ra-_rj1fQhfU6ZvEFKf2CPhMg-YZQMLpIgMLf4XCtUVNAIve1-KQjMqD1TQrJPnciisJn3BQN_M71pvUUWzgOl52mQLaqXQqeplTPmHTtMx7I31oPn_ahw6WjBF3BNsr4I-cowKVJVYYTuAhBNr2hlrPfztrp17EoTur4Q2b-lCrMkIJZpbp2B8lDHjXy5vmpD4v-b_Fz4Kez8ozapeOuZ4cJwSi6u9q48Odih4lKg_m30GJJyIA5k_iNuhj1Iqrt0DP2VTZKQHtotIKOXQma2RyPMPnZoWHOn3y394ksp8169V1VxD8Zmlw3y7XeKxozOy5qOpsbeAfDsVqLlzQ7LRVg4PCJgXXaW89df9zROATp6QtbXUnwN32vAFw4euRHCxKLV2GUyTOulhk7RyaZA-oqNja_zvhZuOBbOP4oPNxWh4UCFfjSohLfvHgZjzHzxZER-OFA_AaF8OoJRRTrKEhQLwzkBhCj_QzNsXqXkLyi4--ecWtqS4_EKXm3_JcvZkLo0sQenNlR8onBZcZ8ZYZTCQ-pPzc3ynWtY1SV687OOTlKKWjtjQyCCKhjXgknuV1yxj2IIfSQPTVhGwGvMbcbXy1jzLd4rNBmD8XU2MsLaN3VbsnhaeUWpYOTZBXqR3yqwXPtyCzLvnetWzwMXK8X-akVTmdKPiT7iryMJAXPPqGG60z8BnpKQU2W8s1DUf--7_0FGUcEx_da-zyaKHQkO7brZapun2FoFETEgDP3LALq1WeCRFIhwLm2DFmOGNTOPYquL3Bf7RgVrXZNET9vUsOsbYTkVXYYikQYHVDM'
+
+# import rich for cleaner output
+#from rich.traceback import install
+#install(show_locals=True)
+#from datetime import datetime as date
+#add OAUTH
+access_token = 'uat.ABbDbpLiqMwyuDkYtBdTUrYjm-gP36LH5o0KYuw2ihkSDqV_7EZLwNw5oE3oyEgU6SNfUu5WeZD077GYmBS9_6qgZ88IN1-OcO05PGtb1OgHdemnEJeKlYbxt7Aota_AVKlfpdbM5cDqeKYi5lOoQVHqno0aNh0Qf-3vTSZncYpntFekcpb-idNhD1S8OGBEkoYComntr43sBx1KjR-0St6lbBN_YYVmDOngz_7z-9KKuPFQeU_jDlbyvvtSmXBfxxuGbORSbcv5LhtNl8q8Xs_SJPIN6n3UpdMmTDDgxhM2taBJdmzaCmB6R-s9qOdgG-R2ZIiAk3oXp0rddZClgz-QbkZ8n7dzIJsRTO-qiwdv2Bq7dTVLpTBTpYstGglc2ouazPZsu5uLsXutQfKLa-P8NhsR4JnZPbVT4B4cYcMMsq4RF5_Kw9fVpmgS3fbZCFAH4m4TEEB83_ezJzcxVqyZpTNDL7oqM5jene05XWDVSYnt0oEEEq0PrA0BzSCQYD0uBaE9Oy0J4T3p046m23eUZlf2nm4MbcBQbRH2g3P-qZRo53d6zy5lCdcBUBZsjS3x4rP40sebOOxTz6R9mB6-YMUrZkhoeH1Cl_ntJ1dn0IW6IVRsJKkj8W-o4i7E2ByETUNNammCiAMbW8NAyFDhytv2E2gmh7FDzkpiy_ROykSe8LsTFPwlkk27k5tfu2j84OhCGHyEruaCWj-XIK4Q970k6ikMmnMmelAIHOJqe1C0tsWR3iPDoGmU6GQawYO6OJqlMo5JSYjEB8N68z7bLivoc7SoY_L5hbW8hj57qgCYGj26nKQksEy2_pJGzJHPbwLjsKKDq8vy4Qpjvlcq4u4h8G2jswpEtkW0CYiQuGTa5WjxAsJiwijEEoG0OZI7lTmwqboB-acSiW54PL51Skdt7M9OktH0RcLd6tciax5IQu1sKgjkcndpJwVDciUcuzYJD0d3CKEs1seQdiP5enpEf-l4-NTEsFEgvTa19d7TnHMPfJnHYu8MFtYDY6E6Q00DLSceYTB3JvMQoUPb2betqmtjC1XfW71QDNpc_OIRWbcWR44yVQ1GPSbMAtImWFnjVm3__oUW3pLP2eNfO0bEWmQMd6VqqvMLOlBOIbx4qiYGG7q-VUanM0nJb5AzoEKL-1SiCJZXdNLhrNo7anBdEYz8Vqrd2uxIFt7tFTwPGELeWJxp4X7Lay4Jq47ZI_euiP2XLDRkA13xAxtG8WDaVzh2zH-AocriTpc-AAbYgL6NhAWVcxwmf2VeExG2rcdH14RTrS9G_PgmiCbD4kME8WZPjk05DLCUT9UOWMVSogpEuXJmqGW4UvW6IXM'
 dbx = dropbox.Dropbox(access_token)
 
 class Node:
@@ -38,25 +43,51 @@ class Node:
         for child in self.children:
             child.print_tree(prefix)
     
-    def download_files(self, dbx, destination_folder):
+    def download_files(self, dbx, destination_folder): # Download tree to destination folder
         destination_path = os.path.join(destination_folder, self.name)
-        print(destination_path)
+        print(f"Copying Dropbox Folder {self.path} to {destination_path}")
+        # If the folder is less than 20GB, less than 10,000 files and doesn't already exist, download as a .zip.
         if self.file_count < 10000 and self.file_count > 0 and self.size < 20 * 1024 * 1024 * 1024:
-            # If the folder is small enough, download it as a zip
-            with open(destination_path + ".zip", "wb") as f:
-                metadata, response = dbx.files_download_zip(self.path) #chunk downloads
-                f.write(response.content)
+            zip_path = destination_path + ".zip"
+            if not os.path.exists(zip_path):  
+                print(f"downloading Directory {zip_path} as .zip file")
+                with open(zip_path, "wb") as f:
+                    metadata, response = dbx.files_download_zip(self.path) #chunk downloads
+                    for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
+                        if chunk:
+                            f.write(chunk)
+            else:
+                print(f"    Skipped. {self.name} already zipped  at {zip_path}")
         else:
-            # If the folder is too large, download file by file and recursively check sub-folders
+            # If the folder is too large, Copy its files and subfolders
             for child in self.children:
-                if child.file_count == 0:  # It's a file
-                    with open(os.path.join(destination_path, child.name), "wb") as f:
-                        metadata, response = dbx.files_download(child.path)
-                        f.write(response.content)
+                file_path = os.path.join(destination_path, child.name)
+                # if it's a file, check if it exists then copy
+                if child.file_count == 0:  # It's a file   
+                    if not os.path.exists(file_path):
+                        print(f"    Downloading file {child.path}")
+                        with open(file_path, "wb") as f:
+                            metadata, response = dbx.files_download(child.path)
+                            for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
+                                if chunk:
+                                    f.write(chunk)
+                    else: 
+                        print(f"    Skipped. File {child.name} already exists at {file_path}")
                 else:  # It's a directory
-                    if not os.path.exists(destination_path): 
-                    os.makedirs(destination_path)
-                    child.download_files(dbx, destination_path)
+                    # If folder or zipped folder doesn't exist, make directory. 
+                    #folder_path = os.path.join(destination_path, child.name)
+                    #zipped_folder = folder_path + ".zip"
+                    #if not os.path.exists(folder_path) and not os.path.exists(zipped_folder): 
+                        #print(folder_path)
+                        #print(zipped_folder)   
+                        #print(f"    Creating Folder {child.path}") 
+                    os.makedirs(file_path)
+                    #else: 
+                         #print(f"    Skipped. Folder already exists at {folder_path}")
+                    child.download_files(dbx, destination_path) #traverse into subfolders and restart function
+                    
+                        
+                        
        
             
         
