@@ -12,18 +12,69 @@ The Node class also provides a to_dict method to transform the Node object into 
 Furthermore, the Node object can also visualize itself and its children nodes in a tree structure using the print_tree method. Another method, download_files, is used for downloading the files represented by the Node object according to certain conditions. Please note that this Node class can be used as a part of a more comprehensive Dropbox account management application and can be utilized to perform operations like downloading folders and files, observing folder sizes and file counts, and visualizing folder structures.
 '''
 import dropbox
+from dropbox.exceptions import AuthError
 import os
+import webbrowser
 import json
+import zipfile
+import shutil
 
 
+
+
+APP_KEY = 'at5epqggtx1gfrh'
+APP_SECRET = '03xtulcqj0bcie7'
+OAUTH_SCOPE = ['account_info.read','files.metadata.read', 'files.content.read','fil_requests.read','Team_data.member','team_data.governance.write','team_data.governance.read','team_data.content.read']
+
+
+def get_oauth2_authorize_url():
+    flow = dropbox.DropboxOAuth2FlowNoRedirect(APP_KEY, OAUTH_SCOPE)
+    authorize_url = flow.start()
+    return authorize_url
+
+def get_access_token(code):
+    try:
+        flow = dropbox.DropboxOAuth2FlowNoRedirect(APP_KEY, OAUTH_SCOPE) 
+        oauth_result = flow.finish(code)
+        return oauth_result.access_token
+    except Exception as e:
+        print('Error in get_access_token', e)
+        return None
+    
+def Oauth():
+    # Get the authorization URL and show it to the user, asking them to visit it in the browser
+    auth_url = get_oauth2_authorize_url()
+    webbrowser.open(auth_url)
+    print('Please authorize the app by visiting this URL: %s\n' % auth_url)
+
+    # After the user completes the authorization, Dropbox will provide a code
+    auth_code = input("Enter the authorization code here: ").strip()
+
+    # The script uses the authorization code to request an access token
+    access_token = get_access_token(auth_code)
+    print("Your access token: ", access_token)
+
+    if access_token is not None:
+        dbx = dropbox.Dropbox(access_token)
+        print(dbx)
+        print("Success!")
+        return dbx
+        # your existing code here ...
+#Oauth()
+
+
+
+
+# ToDOs:
 # import rich for cleaner output
 #from rich.traceback import install
 #install(show_locals=True)
 #from datetime import datetime as date
-#add OAUTH
-access_token = 'uat.ABbDbpLiqMwyuDkYtBdTUrYjm-gP36LH5o0KYuw2ihkSDqV_7EZLwNw5oE3oyEgU6SNfUu5WeZD077GYmBS9_6qgZ88IN1-OcO05PGtb1OgHdemnEJeKlYbxt7Aota_AVKlfpdbM5cDqeKYi5lOoQVHqno0aNh0Qf-3vTSZncYpntFekcpb-idNhD1S8OGBEkoYComntr43sBx1KjR-0St6lbBN_YYVmDOngz_7z-9KKuPFQeU_jDlbyvvtSmXBfxxuGbORSbcv5LhtNl8q8Xs_SJPIN6n3UpdMmTDDgxhM2taBJdmzaCmB6R-s9qOdgG-R2ZIiAk3oXp0rddZClgz-QbkZ8n7dzIJsRTO-qiwdv2Bq7dTVLpTBTpYstGglc2ouazPZsu5uLsXutQfKLa-P8NhsR4JnZPbVT4B4cYcMMsq4RF5_Kw9fVpmgS3fbZCFAH4m4TEEB83_ezJzcxVqyZpTNDL7oqM5jene05XWDVSYnt0oEEEq0PrA0BzSCQYD0uBaE9Oy0J4T3p046m23eUZlf2nm4MbcBQbRH2g3P-qZRo53d6zy5lCdcBUBZsjS3x4rP40sebOOxTz6R9mB6-YMUrZkhoeH1Cl_ntJ1dn0IW6IVRsJKkj8W-o4i7E2ByETUNNammCiAMbW8NAyFDhytv2E2gmh7FDzkpiy_ROykSe8LsTFPwlkk27k5tfu2j84OhCGHyEruaCWj-XIK4Q970k6ikMmnMmelAIHOJqe1C0tsWR3iPDoGmU6GQawYO6OJqlMo5JSYjEB8N68z7bLivoc7SoY_L5hbW8hj57qgCYGj26nKQksEy2_pJGzJHPbwLjsKKDq8vy4Qpjvlcq4u4h8G2jswpEtkW0CYiQuGTa5WjxAsJiwijEEoG0OZI7lTmwqboB-acSiW54PL51Skdt7M9OktH0RcLd6tciax5IQu1sKgjkcndpJwVDciUcuzYJD0d3CKEs1seQdiP5enpEf-l4-NTEsFEgvTa19d7TnHMPfJnHYu8MFtYDY6E6Q00DLSceYTB3JvMQoUPb2betqmtjC1XfW71QDNpc_OIRWbcWR44yVQ1GPSbMAtImWFnjVm3__oUW3pLP2eNfO0bEWmQMd6VqqvMLOlBOIbx4qiYGG7q-VUanM0nJb5AzoEKL-1SiCJZXdNLhrNo7anBdEYz8Vqrd2uxIFt7tFTwPGELeWJxp4X7Lay4Jq47ZI_euiP2XLDRkA13xAxtG8WDaVzh2zH-AocriTpc-AAbYgL6NhAWVcxwmf2VeExG2rcdH14RTrS9G_PgmiCbD4kME8WZPjk05DLCUT9UOWMVSogpEuXJmqGW4UvW6IXM'
-dbx = dropbox.Dropbox(access_token)
+#add OAUTH catch dropbox.exceptions.AuthError
 
+
+access_token = 'sl.BrpdYz1DLnCEKTj8_DbgetWg9aR6JUEg_Ptuht3tV5I2x9oL1EP--XLT6mH4-uDf444nOo2EXlJESPPQWXLGB1NZUabSJF1atMqseUXOrf-mlJohjLWnUNVnYlwTwa3y1aJXUgGh13Gm'
+dbx = dropbox.Dropbox(access_token)
 class Node:
 
     def __init__(self, name, path, size=0,file_count=0, children=None, errors=None,errorlist=None):
@@ -45,27 +96,53 @@ class Node:
     
     def download_files(self, dbx, destination_folder): # Download tree to destination folder
         destination_path = os.path.join(destination_folder, self.name)
-        print(f"Copying Dropbox Folder {self.path} to {destination_path}")
+        print(f"Copying Dropbox Folder {self.path}\n to {destination_path}")
         # If the folder is less than 20GB, less than 10,000 files and doesn't already exist, download as a .zip.
+        # NOTE zip fails with internal server error if restricted files are in the zipped folder. Except error, copy folder as if it was a normal folder.
         if self.file_count < 10000 and self.file_count > 0 and self.size < 20 * 1024 * 1024 * 1024:
             zip_path = destination_path + ".zip"
-            if not os.path.exists(zip_path):  
-                print(f"downloading Directory {zip_path} as .zip file")
-                with open(zip_path, "wb") as f:
-                    metadata, response = dbx.files_download_zip(self.path) #chunk downloads
-                    for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
-                        if chunk:
-                            f.write(chunk)
+            flag_file_path = zip_path + ".incomplete" # flag file for incomplete downloads Maybe try modifying JSON?
+            if os.path.exists(flag_file_path):
+                os.remove(zip_path)  # delete incomplete file
+            if (not os.path.exists(zip_path)) and (not os.path.exists(destination_path)):  
+                print(f"    downloading Folder {self.path} as .zip file")
+                try:
+                    with open(flag_file_path, 'w') as flag_file:  # create a flag file
+                        pass
+                    with open(zip_path, "wb") as f:
+                        metadata, response = dbx.files_download_zip(self.path) #chunk downloads
+                        for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
+                            if chunk:
+                                f.write(chunk)
+                    os.remove(flag_file_path)
+                     # Extract the .zip file
+                     # to-do ADD option to run or not run this
+                    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                        print(f"        extracting {self.path}")
+                        subdirectory = destination_path + '/' + zip_ref.namelist()[0]
+                        zip_ref.extractall(destination_path)
+                        shutil.copytree(subdirectory, destination_path, dirs_exist_ok=True)
+                        shutil.rmtree(subdirectory)
+                    os.remove(zip_path)
+                except  dropbox.exceptions.InternalServerError as s:
+                    print(f"{s}. Does {self.path} contain restricted files?" )
             else:
                 print(f"    Skipped. {self.name} already zipped  at {zip_path}")
         else:
-            # If the folder is too large, Copy its files and subfolders
-            for child in self.children:
+             # If the folder is too large, Copy its files and subfolders
+            if not os.path.exists(destination_path):
+                os.makedirs(destination_path) 
+            for child in self.children: #traverse down to children i.e. subfolders and files
                 file_path = os.path.join(destination_path, child.name)
-                # if it's a file, check if it exists then copy
-                if child.file_count == 0:  # It's a file   
+                # if it's a file, check if it exists then download
+                if child.file_count == 0:  # It's a file
+                    flag_file_path = file_path + ".incomplete" # flag file for incomplete downloads Maybe try modifying JSON?
+                    if os.path.exists(flag_file_path):
+                        os.remove(file_path)  # delete incomplete file
                     if not os.path.exists(file_path):
                         print(f"    Downloading file {child.path}")
+                        with open(flag_file_path, 'w') as flag_file:  # create a flag file
+                            pass
                         with open(file_path, "wb") as f:
                             metadata, response = dbx.files_download(child.path)
                             for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
@@ -73,24 +150,24 @@ class Node:
                                     f.write(chunk)
                     else: 
                         print(f"    Skipped. File {child.name} already exists at {file_path}")
-                else:  # It's a directory
-                    # If folder or zipped folder doesn't exist, make directory. 
-                    #folder_path = os.path.join(destination_path, child.name)
-                    #zipped_folder = folder_path + ".zip"
-                    #if not os.path.exists(folder_path) and not os.path.exists(zipped_folder): 
-                        #print(folder_path)
-                        #print(zipped_folder)   
-                        #print(f"    Creating Folder {child.path}") 
-                    os.makedirs(file_path)
-                    #else: 
-                         #print(f"    Skipped. Folder already exists at {folder_path}")
-                    child.download_files(dbx, destination_path) #traverse into subfolders and restart function
+                else:  # It's a directory; recurse function
+                    child.download_files(dbx, destination_path) 
+
+                    ##### SLATED TO DELETE
+                     #If folder or zipped folder doesn't exist, make directory. 
+                    '''folder_path = os.path.join(destination_path, child.name)
+                    zipped_folder = folder_path + ".zip"
+                    if not os.path.exists(folder_path) and not os.path.exists(zipped_folder): 
+                        print(folder_path)
+                        print(zipped_folder)   
+                        print(f"    Creating Folder {child.path}")
+                        os.makedirs(folder_path)                  
+                    else: 
+                         print(f"    Skipped. Folder already exists at {folder_path}") '''
+                    #child.download_files(dbx, destination_path) #traverse into subfolders and restart function
                     
                         
-                        
-       
-            
-        
+                         
     def to_dict(self):
         return {
             "name": self.name,
@@ -158,15 +235,11 @@ def load_tree_from_file(filename):
     return Node.from_dict(tree_dict),errorlist
 
 
-
+'''
 errorlist = []
 #root = create_tree('/WLMS & Izzy Build Steps')
-#root = create_tree('/CEG 1 - All Lab Members')
-#root.print_tree()
-#print(errorlist)
-#save_tree_to_file(root, 'CEG_1.json')
-''' download function
-download_path = "\\\\lsa-rosati-win.turbo.storage.umich.edu\lsa-rosati\Google-Drive-Backup\\"  
-final_path = download_path + date.now().strftime("%Y") + "\\" + date.now().strftime("%B %Y")
-root.download_files(dbx,final_path)
+root = create_tree('/CEG 1 - All Lab Members')
+root.print_tree()
+print(errorlist)
+save_tree_to_file(root, 'CEG_1.json')
 '''
