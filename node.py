@@ -6,6 +6,17 @@ import time
 import http.client
 import requests
 import urllib3
+import tkinter
+
+
+
+
+
+
+
+
+
+
 # Create tree block
 #root = create_tree('/WLMS & Izzy Build Steps')
 #root = create_tree('/CEG 1 - All Lab Members')
@@ -18,7 +29,8 @@ root,errorlist = tree.load_tree_from_file("CEG_1.json")
 
 
 #download block
-download_path = "\\\\lsa-rosati-win.turbo.storage.umich.edu\lsa-rosati\Google-Drive-Backup\\"  
+
+#download_path = "\\\\lsa-rosati-win.turbo.storage.umich.edu\lsa-rosati\Google-Drive-Backup\\"  
 final_path = download_path + date.now().strftime("%Y") + "\\" + date.now().strftime("%B %Y")
 
 max_retries = 5
