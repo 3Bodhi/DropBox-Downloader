@@ -72,8 +72,7 @@ def Oauth():
 #from datetime import datetime as date
 #add OAUTH catch dropbox.exceptions.AuthError
 
-
-access_token = 'sl.BrpdYz1DLnCEKTj8_DbgetWg9aR6JUEg_Ptuht3tV5I2x9oL1EP--XLT6mH4-uDf444nOo2EXlJESPPQWXLGB1NZUabSJF1atMqseUXOrf-mlJohjLWnUNVnYlwTwa3y1aJXUgGh13Gm'
+access_token = 'uat.ADhzLLQOPhxZUGVrTKgIM_NvQDyXlFlCtXx8Fvg-CfmHwVbL1rbtQpSjYzgLmSVgHcF7oJTgOY0beJjiGVqXd6fQCH85R_B1Rh0ATgXqzbVasnovDa6cNfZfzfqj2ooCpWbnApHQp0AEdehTlaoxne5cR1jAoinslz_oXRLil2NNpNZY0mobewstJ4jmwO6LTBuafMvHkvsZvLDGr63-qu3CjFQFx_JaKP2y3xNEZuvHrJ2jTy0v1fEjJ3e6-BnQbtmqBrQjHW24IrprprL4BLT1Yjij28gfP5Y-PpWWEvI0nvUHqIE2nF1ePnWDSf9L5kV3gPdELGKMVYmq0LjSFfs5u__drzOGwDtiaTXqPJhYhcLBIYs6RHZ2jZls7IaCT5-HKNbsY2a5IC5j8eSMYPwn6F0mEdD3ZbEbP4CZN40Us5rfvIBQTdZ6oIFWKthDKurulkAmWLLULNu5HRC4uMIPH4Tak6A_-ZaO7Gsf4LvQHDvxqAI2MwNQIqEqNmWzUk7MamnlnVZrxxqkM9y1SdPBaGBneJGzKGTG4DyB9S3ve7wVtuK1kdV_1nQQa5ALY0-ruYvT_ErNgiNuRlX7Au9DJlkGQgn3TRDHAgCVkhH-56aKCQLEDgD3lzjai9tWfhV4mYggfifZ5OXYlOEEnmzQLe6ScFQy12G4KronGiq0CnuiIjuJnLPD_Sdqzvga9BvYxKQqND8Agz45_WfZKnrVZSUnG76Wh_7wvSCFc_1dA1chFrgTR267hFwAWcr7nV596yrXssJcIEqDA_O1UjewkztPfqorEaFNjwbMxYRejkKE9YmmZoeBX1eF1i_97Ov1WyWXcOwA71nz-MUr-SW3oDvWkl-8x1xmym67SbiFCrYYQc6j28ZSiwykoHmGKky9rBokQzjoGL3hrkYuwad4R_O4boMXDx0owhEWnPE3DhHo2ff41cvNsUfIZKBtsb0zrDLVFWqBni3sIBYQXWHJ4OJllvRXLg-Bk5kvNPqnOjhkmWNT-fu8MQ-l2KKQY8K9DTX_PN33gwminECvU6NLh9ddhHN4AixBOszlVkshl0SDWaokkGDTw1shwykWGqGUwq292YFAc8l1UG2LG07Mw2976ucDwmNATnqrScqqfsGv5noFTp37c5O3uXztmldoFLbtpSbPTPZ7iHe1eMhRO9hYY5gAaCcwEIi22YOn6t8yrjD3ODkIclTBMV6oG2B3J2woh_GpI0zkmAlmn2Rumw1VTh8--lFTKHju-lMtP6139Jhdp2BTTkfsRKgryEMFf0_V22EchxooMGdgJadiUaImwXolj8HBoHFBRNlIWwmT3QXguEEz3vQLS9YlDpw'
 dbx = dropbox.Dropbox(access_token)
 class Node:
 
@@ -87,16 +86,14 @@ class Node:
         errorlist = errorlist
     def add_child(self, child):
         self.children.append(child)
-
     def print_tree(self, prefix=""):
         print(f"{prefix}|-- {self.name}, {(self.size/1024/1024/104)} gigabytes, {self.file_count} files")
         prefix += " "
         for child in self.children:
-            child.print_tree(prefix)
-    
+            child.print_tree(prefix)  
     def download_files(self, dbx, destination_folder): # Download tree to destination folder
         destination_path = os.path.join(destination_folder, self.name)
-        print(f"Copying Dropbox Folder {self.path}\n to {destination_path}")
+        print(f"Copying Dropbox Folder {self.path}\nto {destination_path}")
         # If the folder is less than 20GB, less than 10,000 files and doesn't already exist, download as a .zip.
         # NOTE zip fails with internal server error if restricted files are in the zipped folder. Except error, copy folder as if it was a normal folder.
         if self.file_count < 10000 and self.file_count > 0 and self.size < 20 * 1024 * 1024 * 1024:
@@ -126,7 +123,9 @@ class Node:
                     os.remove(zip_path)
                 except  dropbox.exceptions.InternalServerError as s:
                     print(f"{s}. Does {self.path} contain restricted files?" )
-            else:
+                    #TODO when donwload_files is refactored into several functions, add logic to redirected zip 500 exceptions to try to download individual files.
+                except dropbox.exceptions.AuthError as a:
+                    print(f"{a}.Please Generate a new API Token and run the program again.")
                 print(f"    Skipped. {self.name} already zipped  at {zip_path}")
         else:
              # If the folder is too large, Copy its files and subfolders
@@ -148,6 +147,7 @@ class Node:
                             for chunk in response.iter_content(chunk_size=8* 1024 * 1024):  # chunk size is 8MB
                                 if chunk:
                                     f.write(chunk)
+                        os.remove(flag_file_path)
                     else: 
                         print(f"    Skipped. File {child.name} already exists at {file_path}")
                 else:  # It's a directory; recurse function
@@ -164,10 +164,7 @@ class Node:
                         os.makedirs(folder_path)                  
                     else: 
                          print(f"    Skipped. Folder already exists at {folder_path}") '''
-                    #child.download_files(dbx, destination_path) #traverse into subfolders and restart function
-                    
-                        
-                         
+                    #child.download_files(dbx, destination_path) #traverse into subfolders and restart function                     
     def to_dict(self):
         return {
             "name": self.name,
@@ -180,8 +177,7 @@ class Node:
         }
     @classmethod
     def from_dict(cls, dict):
-        return cls(dict.get("name", ""), dict.get("path", ""), dict.get("size", 0), dict.get("file_count", 0), dict.get("children", None), dict.get("errors", None))  
-        
+        return cls(dict.get("name", ""), dict.get("path", ""), dict.get("size", 0), dict.get("file_count", 0), dict.get("children", None), dict.get("errors", None))         
 def get_folder_size(node):
     total_size = 0
     try:
@@ -198,13 +194,11 @@ def get_folder_size(node):
         node.errors.append(node.path)
     node.size = total_size
     return total_size
-
 def create_tree(path):
     root_node = Node("", path)
     get_folder_size(root_node)
     map_children(root_node)
     return root_node
-
 def map_children(node):
     res = dbx.files_list_folder(node.path, recursive=False)
     try:
@@ -223,11 +217,9 @@ def map_children(node):
                 break
     except dropbox.exceptions.ApiError as e:
         print(f"[WARNING] Failed to list children for folder {node.path} due to API error: {e}")
-
 def save_tree_to_file(root, filename):
     with open(filename, 'w') as file:
         json.dump(root.to_dict(), file)
-
 def load_tree_from_file(filename):
     with open(filename, 'r') as f:
         tree_dict = json.load(f)
@@ -235,8 +227,9 @@ def load_tree_from_file(filename):
     return Node.from_dict(tree_dict),errorlist
 
 
-'''
+
 errorlist = []
+'''
 #root = create_tree('/WLMS & Izzy Build Steps')
 root = create_tree('/CEG 1 - All Lab Members')
 root.print_tree()
