@@ -30,7 +30,7 @@ root,errorlist = tree.load_tree_from_file("CEG_1.json")
 
 #download block
 
-#download_path = "\\\\lsa-rosati-win.turbo.storage.umich.edu\lsa-rosati\Google-Drive-Backup\\"  
+download_path = "\\\\lsa-rosati-win.turbo.storage.umich.edu\lsa-rosati\Google-Drive-Backup\\"  
 final_path = download_path + date.now().strftime("%Y") + "\\" + date.now().strftime("%B %Y")
 
 max_retries = 5
@@ -40,7 +40,7 @@ retry_count = 0
 while retry_count < max_retries:
     try:
         root.download_files(dbx,final_path)
-        print("Download Completed.")
+        print("Script has completed. Check for Errors")
         break
     except (http.client.RemoteDisconnected, ConnectionError, urllib3.exceptions.ProtocolError, requests.exceptions.ConnectionError) as e:
         retry_count += 1
