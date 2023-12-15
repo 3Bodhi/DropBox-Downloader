@@ -97,6 +97,7 @@ class Node:
         print(f"Copying Dropbox Folder {self.path}\nto {destination_path}")
         # If the folder is less than 20GB, less than 10,000 files and doesn't already exist, download as a .zip.
         # NOTE zip fails with internal server error if restricted files are in the zipped folder. Except error, copy folder as if it was a normal folder.
+        # NOTE zip fails with internal server error if restricted files are in the zipped folder. Except error, copy folder as if it was a normal folder.
         if self.file_count < 10000 and self.file_count > 0 and self.size < 20 * 1024 * 1024 * 1024:
             zip_path = destination_path + ".zip"
             flag_file_path = zip_path + ".incomplete" # flag file for incomplete downloads Maybe try modifying JSON?

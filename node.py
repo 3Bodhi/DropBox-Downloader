@@ -25,7 +25,7 @@ import tkinter
 # Tree load block
 root,errorlist = tree.load_tree_from_file("CEG_1.json")
 #root.print_tree()
-#print(f" Errors {errorlist}")
+print(f" Errors {errorlist}")
 
 
 #download block
